@@ -9,7 +9,6 @@ public class ResourceCreator : MonoBehaviour
     [SerializeField] private Transform _resourceHolder;
     [SerializeField] private ResourceCreatorConfig _resourceConfig;
 
-    
     private WaitForSeconds _produceTime;
     private WaitForSeconds _waitingTime;
     private Coroutine _produceCoroutine;

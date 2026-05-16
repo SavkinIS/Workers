@@ -19,7 +19,6 @@ public class TargetMover : MonoBehaviour
 
     private bool IsCanMove => HasTarget && !IsDestinationReached;
 
-
     private void Awake()
     {
         IsDestinationReached = true;

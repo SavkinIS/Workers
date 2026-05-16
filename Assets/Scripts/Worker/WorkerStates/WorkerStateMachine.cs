@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace WorkerStates
 {
@@ -21,7 +20,6 @@ namespace WorkerStates
                 
             };
             
-            
             SetState(typeof(IdleState));
         }
 
@@ -40,7 +38,8 @@ namespace WorkerStates
         
         public void Dispose()
         {
-            
+            _currentState?.Exit();
+            _states.Clear();
         }
     }
 }

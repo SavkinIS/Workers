@@ -27,8 +27,6 @@ namespace WorkerStates
 
         public void Exit()
         {
-           
-            
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Storage : MonoBehaviour
 {
@@ -44,7 +42,7 @@ public class Storage : MonoBehaviour
 
     public void Claim(ResourceItem resourceItem)
     {
-        resourceItem.SetParent(_putTarget);
+        resourceItem.Disable(_putTarget);
         _collectedResources.Add(resourceItem);
         _storageInfo.UpdateResourceAmount(_collectedResources.Count);
     }

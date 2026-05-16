@@ -8,7 +8,6 @@ public class Worker : MonoBehaviour
     [SerializeField] private Transform _handPlace;
 
     private WorkerStateMachine _stateMachine;
-    
     private ResourceItem _resource;
     private Storage _storage;
 

@@ -4,17 +4,14 @@ namespace WorkerStates
     {
         public IdleState()
         {
-            
         }
 
         public void Enter()
         {
-           
         }
 
         public void Exit()
         {
-            
         }
     }
 }

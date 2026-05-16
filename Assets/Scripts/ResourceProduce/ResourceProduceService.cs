@@ -6,10 +6,9 @@ public class ResourceProduceService : MonoBehaviour
 {
     [SerializeField] private List<ResourceCreator>  _resourceCreators = new List<ResourceCreator>();
 
-    private List<ResourceItem> _resourceItems = new List<ResourceItem>();
+    private readonly List<ResourceItem> _resourceItems = new List<ResourceItem>();
     
     public event Action ProduceCompleted;
-
 
     private void OnEnable()
     {
@@ -54,7 +53,7 @@ public class ResourceProduceService : MonoBehaviour
             _resourceItems.Remove(resourceItem);
     }
 
-    public void ResourceProduced(ResourceItem resourceItem)
+    private void ResourceProduced(ResourceItem resourceItem)
     {
         _resourceItems.Add(resourceItem);
         ProduceCompleted?.Invoke();
