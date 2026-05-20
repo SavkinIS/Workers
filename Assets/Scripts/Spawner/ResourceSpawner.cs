@@ -12,15 +12,13 @@ public class ResourceSpawner : SpawnerBase<ResourceItem>
 
     public ResourceItem Spawn()
     {
-        _pool.Get(out ResourceItem item);
-        _activeObjects.Add(item);
+        Pool.Get(out ResourceItem item);
         return item;
     }
 
     protected override void ReleasedToPool(ResourceItem spawnableObject)
     {
-        _pool.Release(spawnableObject);
-        _activeObjects.Remove(spawnableObject);
+        Pool.Release(spawnableObject);
     }
 
     protected override void Release(ResourceItem spawnableObject)

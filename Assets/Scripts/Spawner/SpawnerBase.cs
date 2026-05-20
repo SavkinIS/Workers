@@ -6,14 +6,12 @@ namespace Spawner
 {
     public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject 
     {
+        protected ObjectPool<T> Pool;
         private readonly int _poolCapacity = 50;
     
-        protected ObjectPool<T> _pool;
-        protected List<T> _activeObjects = new List<T>();
-   
         protected void CreatePool()
         {
-            _pool = new ObjectPool<T>(
+            Pool = new ObjectPool<T>(
                 createFunc: InstantiateSpawnableObject,
                 actionOnGet: OnGetNextSpawnableObject,
                 actionOnRelease: Release,

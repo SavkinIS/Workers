@@ -30,6 +30,7 @@ public class Worker : MonoBehaviour
     {
         TargetResource = resource;
         IsBusy = true;
+        resource.SetReserved();
         _stateMachine.SetState(typeof(MoveState));
     }
     

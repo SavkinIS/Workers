@@ -1,26 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Storage : MonoBehaviour
 {
     [SerializeField] private List<Worker> _workers;
-    [SerializeField] private ResourceProduceService _resourceService;
     [SerializeField] private Transform _inputZone;
     [SerializeField] private Transform _putTarget;
-    [SerializeField] private StorageInfo _storageInfo;
+    [SerializeField] private Scanner _scanner;
     
-    private List<ResourceItem> _collectedResources =  new List<ResourceItem>(); 
-    
+    private List<ResourceItem> _collectedResources = new List<ResourceItem>();
+
     public Transform InputZone => _inputZone;
     public Transform PutTarget => _putTarget;
+    
+    public event Action<int> ChangedResourceAmount;
 
     private void OnEnable()
     {
-        foreach (var worker in _workers)
-        {
-            worker.ResourceKeeped += WorkerKeepResource;
-            worker.WorkCompleted += WorkCompleted;
-        }
+        _scanner.Scanned += SendWorker;
     }
 
     private void Start()
@@ -29,52 +27,43 @@ public class Storage : MonoBehaviour
         {
             worker.Initialize(this);
         }
+        
+        ChangedResourceAmount?.Invoke(_collectedResources.Count);
     }
 
     private void OnDisable()
     {
-        foreach (var worker in _workers)
-        {
-            worker.ResourceKeeped -= WorkerKeepResource;
-            worker.WorkCompleted -= WorkCompleted;
-        }
+        _scanner.Scanned += SendWorker;
     }
 
     public void Claim(ResourceItem resourceItem)
     {
         resourceItem.Disable(_putTarget);
         _collectedResources.Add(resourceItem);
-        _storageInfo.UpdateResourceAmount(_collectedResources.Count);
+        ChangedResourceAmount?.Invoke(_collectedResources.Count);
     }
 
-    public void ResourceCreated()
+    private void SendWorker(List<ResourceItem>  scannedResources)
     {
-        SendWorker();
-    }
-
-    private void SendWorker()
-    {
-        for (int i = 0; i < _workers.Count; i++)
+        foreach (var resourceItem in scannedResources)
         {
-            if (_workers[i].IsBusy ==  false)
+            Worker worker =  GetFreeWorker();
+
+            if (worker != null)
             {
-                Worker worker = _workers[i];
-               
-                if (_resourceService.TryGetNotReservedResource(out ResourceItem resourceItem) == false)
-                    return;
-        
                 worker.SendToResource(resourceItem);
             }
         }
     }
-    
-    private void WorkCompleted()
-    {
-        SendWorker();
-    }
 
-    private void WorkerKeepResource(ResourceItem resourceItem)
+    private Worker GetFreeWorker()
     {
-        _resourceService.RemoveResource(resourceItem);
+        foreach (var worker in _workers)
+        {
+            if (worker.IsBusy == false)
+                return worker;
+        }
+        
+        return null;
     }
 }

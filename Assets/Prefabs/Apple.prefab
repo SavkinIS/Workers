@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4971307107130625807}
   - component: {fileID: 6982730407064159406}
   - component: {fileID: 774443019390022845}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Apple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1205120938787063975}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 170578615701e4acf9977e1f9c36a704, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

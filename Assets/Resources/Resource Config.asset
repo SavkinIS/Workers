@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Resource Config
   m_EditorClassIdentifier: 
   ProduceDuration: 3
-  WaitingeDuration: 2
+  WaitingeDuration: 3

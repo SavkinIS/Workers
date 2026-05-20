@@ -13,8 +13,6 @@ public class ResourceCreator : MonoBehaviour
     private WaitForSeconds _waitingTime;
     private Coroutine _produceCoroutine;
 
-    public event Action<ResourceItem> ProduceCompleted;
-
     private void Awake()
     {
         _produceTime = new WaitForSeconds(_resourceConfig.ProduceDuration);
@@ -36,10 +34,7 @@ public class ResourceCreator : MonoBehaviour
 
             yield return _produceTime;
             resourceItem.SetCompleted();
-            ProduceCompleted?.Invoke(resourceItem);
-
             yield return _waitingTime;
         }
     }
-
 }
