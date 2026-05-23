@@ -12,6 +12,7 @@ public class ResourceCreator : MonoBehaviour
     private WaitForSeconds _produceTime;
     private WaitForSeconds _waitingTime;
     private Coroutine _produceCoroutine;
+    private bool _isActive = true;
 
     private void Awake()
     {
@@ -26,7 +27,7 @@ public class ResourceCreator : MonoBehaviour
 
     private IEnumerator ProduceCoroutine()
     {
-        while (true)
+        while (_isActive)
         {
             ResourceItem resourceItem = _resourceSpawner.Spawn();
             resourceItem.SetParent(_resourceHolder);

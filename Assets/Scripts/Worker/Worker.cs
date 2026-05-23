@@ -9,21 +9,18 @@ public class Worker : MonoBehaviour
 
     private WorkerStateMachine _stateMachine;
     private ResourceItem _resource;
-    private Storage _storage;
 
     public bool HasResource => _resource != null;
     public Transform HandPlace => _handPlace;
     public bool IsBusy { get; private set; }
     public ResourceItem TargetResource { get;  private set;}
     public ResourceItem Resource => _resource;
-    public event Action WorkCompleted;
 
-    public event Action<ResourceItem> ResourceKeeped;
+    public event Action<ResourceItem> ResourcePutted;
 
-    public void Initialize(Storage storage)
+    public void Initialize(Transform storageUnloadZone,Transform storagePutTarget)
     {
-        _storage =  storage;
-        _stateMachine = new WorkerStateMachine(_targetMover, _storage, this);
+        _stateMachine = new WorkerStateMachine(_targetMover, storageUnloadZone, storagePutTarget, this);
     }
 
     public void SendToResource(ResourceItem resource)
@@ -42,20 +39,14 @@ public class Worker : MonoBehaviour
        if (_resource == null)
            return;
        
-       ResourceKeeped?.Invoke(_resource);
        _resource.SetParent(HandPlace);
     }
 
     public void PutResource()
     {
+        ResourcePutted?.Invoke(_resource);
         _resource = null;
         IsBusy = false;
-        _stateMachine.SetState(typeof(IdleState));
+       
     }
-
-    public void CompleteWork()
-    {
-        WorkCompleted?.Invoke();
-    }
-    
 }

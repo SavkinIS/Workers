@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
 using UnityEngine;
 
 public class Scanner : MonoBehaviour
@@ -11,13 +10,15 @@ public class Scanner : MonoBehaviour
     [SerializeField] private float _delay;
     [SerializeField] private Vector3 _endScale;
     [SerializeField] private float _scanTime = 1.5f;
-    
-    private readonly List<ResourceItem> _scannedResources = new List<ResourceItem>();
+    [SerializeField] private float _speed = 0.2f;
+    [SerializeField] private LayerMask _layerMask;
+
     private WaitForSeconds _durationTime;
     private Vector3 _scannerPosition;
     private float _scannerRadius;
     private WaitForSeconds _delayTime;
     private Vector3 _startScale;
+    private bool _isActive = true;
 
     public event Action<List<ResourceItem>> Scanned;
 
@@ -27,44 +28,51 @@ public class Scanner : MonoBehaviour
         _durationTime = new WaitForSeconds(_scanTime);
         StartCoroutine(ScanCoroutine());
         _startScale = _scannerItem.localScale;
-
-        _detector.TriggerEntered += TriggerEntered;
-    }
-
-    private void TriggerEntered(Collider other)
-    {
-        if (other.TryGetComponent(out ResourceItem resourceItem))
-        {
-            if (resourceItem.IsReserved || resourceItem.CanHarvest == false || _scannedResources.Contains(resourceItem))
-                return;
-            
-            _scannedResources.Add(resourceItem);
-        }
     }
 
     private IEnumerator ScanCoroutine()
     {
-        while (true)
+        while (_isActive)
         {
             yield return _delayTime;
-            Scan();
+            yield return Scan();
             yield return _durationTime;
         }
     }
 
-    private void Scan()
+    private IEnumerator Scan()
     {
-        DOTween.KillAll(_scannerItem);
-        _scannedResources.Clear();
+        
         _scannerItem.gameObject.SetActive(true);
-        _scannerItem.DOScale(_endScale, _scanTime).OnComplete(CompleteScanning);
-    }
 
-    private void CompleteScanning()
-    {
+        while (Vector3.Distance(_scannerItem.localScale, _endScale) > 1f)
+        {
+            _scannerItem.localScale = Vector3.Lerp(
+                _scannerItem.localScale,
+                _endScale,
+                _speed * Time.deltaTime
+            );
+
+            var hits = Physics.OverlapSphere(_scannerPosition, _scannerItem.localScale.x, _layerMask);
+
+            List<ResourceItem> scannedResources = new List<ResourceItem>();
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent(out ResourceItem resourceItem))
+                {
+                    if (scannedResources.Contains(resourceItem) == false)
+                    {
+                        scannedResources.Add(resourceItem);
+                    }
+                }
+            }
+            
+            Scanned?.Invoke(scannedResources);
+            yield return null;
+        }
+
+       
         _scannerItem.gameObject.SetActive(false);
         _scannerItem.localScale = _startScale;
-        
-        Scanned?.Invoke(_scannedResources);
     }
 }

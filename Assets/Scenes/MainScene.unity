@@ -1961,6 +1961,10 @@ MonoBehaviour:
   _delay: 5
   _endScale: {x: 150, y: 0.13, z: 150}
   _scanTime: 1.5
+  _speed: 5
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &690146972
 GameObject:
   m_ObjectHideFlags: 0

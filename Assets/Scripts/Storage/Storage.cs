@@ -10,22 +10,24 @@ public class Storage : MonoBehaviour
     [SerializeField] private Scanner _scanner;
     
     private List<ResourceItem> _collectedResources = new List<ResourceItem>();
-
-    public Transform InputZone => _inputZone;
-    public Transform PutTarget => _putTarget;
     
     public event Action<int> ChangedResourceAmount;
 
     private void OnEnable()
     {
         _scanner.Scanned += SendWorker;
+        
+        foreach (var worker in _workers)
+        {
+            worker.ResourcePutted += Claim;
+        }
     }
 
     private void Start()
     {
         foreach (var worker in _workers)
         {
-            worker.Initialize(this);
+            worker.Initialize(_inputZone, _putTarget);
         }
         
         ChangedResourceAmount?.Invoke(_collectedResources.Count);
@@ -33,7 +35,12 @@ public class Storage : MonoBehaviour
 
     private void OnDisable()
     {
-        _scanner.Scanned += SendWorker;
+        foreach (var worker in _workers)
+        {
+            worker.ResourcePutted -= Claim;
+        }
+        
+        _scanner.Scanned -= SendWorker;
     }
 
     public void Claim(ResourceItem resourceItem)

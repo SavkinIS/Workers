@@ -6,16 +6,17 @@ namespace WorkerStates
     public class MoveState : IWorkerState
     {
         private readonly TargetMover _targetMover;
-        private readonly Storage _storage;
         private readonly WorkerStateMachine _stateMachine;
         private readonly Worker _worker;
         private Coroutine _moveCoroutine;
         private bool _moveToBase;
+        private bool _isActive = true;
+        private readonly Transform _storageUnloadZone;
 
-        public MoveState(WorkerStateMachine stateMachine, TargetMover targetMover, Storage storage, Worker worker)
+        public MoveState(WorkerStateMachine stateMachine, TargetMover targetMover, Transform storageUnloadZone, Worker worker)
         {
             _targetMover = targetMover;
-            _storage = storage;
+            _storageUnloadZone = storageUnloadZone;
             _stateMachine = stateMachine;
             _worker = worker;
         }
@@ -28,7 +29,7 @@ namespace WorkerStates
             
             if (_worker.HasResource)
             {
-                target = _storage.InputZone;
+                target = _storageUnloadZone;
                 _moveToBase =  true;
             }
             else
@@ -43,7 +44,7 @@ namespace WorkerStates
         
         private IEnumerator MoveCoroutine()
         {
-            while (true)
+            while (_isActive)
             {
                 _targetMover.Move();
                 yield return null;

@@ -9,14 +9,14 @@ namespace WorkerStates
         private readonly Dictionary<Type, IWorkerState> _states;
         private IWorkerState _currentState;
 
-        public WorkerStateMachine( TargetMover targetMover, Storage storage, Worker worker)
+        public WorkerStateMachine( TargetMover targetMover, Transform storageUnloadZone,Transform storagePutTarget, Worker worker)
         {
             _states = new Dictionary<Type, IWorkerState>()
             {
                 { typeof(IdleState), new IdleState() },
-                { typeof(MoveState), new MoveState(this, targetMover, storage, worker) },
+                { typeof(MoveState), new MoveState(this, targetMover, storageUnloadZone, worker) },
                 { typeof(KeepState), new KeepState(this, worker) },
-                { typeof(PutState), new PutState(this, worker, storage) },
+                { typeof(PutState), new PutState(this, worker, storagePutTarget) },
                 
             };
             

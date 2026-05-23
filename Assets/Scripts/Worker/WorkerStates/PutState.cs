@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace WorkerStates
 {
     public class PutState : IWorkerState
@@ -5,14 +7,12 @@ namespace WorkerStates
         private readonly WorkerStateMachine _stateMachine;
         private readonly Worker _worker;
         private readonly ReplaceAnimation _replaceAnimation;
-        private readonly Storage _storage;
 
-        public PutState(WorkerStateMachine stateMachine, Worker worker, Storage storage)
+        public PutState(WorkerStateMachine stateMachine, Worker worker, Transform storagePutTarget)
         {
             _stateMachine = stateMachine;
             _worker = worker;
-            _replaceAnimation = new ReplaceAnimation(storage.PutTarget);
-            _storage = storage;
+            _replaceAnimation = new ReplaceAnimation(storagePutTarget);
         }
         
         public void Enter()
@@ -28,10 +28,8 @@ namespace WorkerStates
             if (_worker.Resource == null)
                 return;
             
-            _storage.Claim(_worker.Resource);
             _worker.PutResource();
             _stateMachine.SetState(typeof(IdleState));
-            _worker.CompleteWork();
         }
 
         public void Exit()

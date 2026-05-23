@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Worker Config
   m_EditorClassIdentifier: Assembly-CSharp:Configs:WorkerConfig
-  MoveSpeed: 6.2
-  ArrivalThreshold: 1.2
+  _moveSpeed: 5
+  _arrivalThreshold: 1.26
