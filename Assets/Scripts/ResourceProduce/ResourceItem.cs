@@ -13,15 +13,14 @@ public class ResourceItem : SpawnableObject
     [SerializeField] private MeshRenderer _renderer;
     [SerializeField] private Material _creaedMaterial;
     [SerializeField] private Material _compitedMaterial;
-    [SerializeField] Rigidbody _rigidbody;
+    [SerializeField] private Rigidbody _rigidbody;
 
     private ResourceItemsStates _state;
     public event Action<ResourceItem> Disabled;
-    
+
     public Transform Transform => transform;
-    public bool CanHarvest => _state == ResourceItemsStates.Completed;
-    public bool IsReserved { get;  private set; }
-  
+    public bool IsReserved { get; private set; }
+
     public void Initialize()
     {
         _state = ResourceItemsStates.Created;
@@ -32,7 +31,6 @@ public class ResourceItem : SpawnableObject
     {
         _state = ResourceItemsStates.Completed;
         UpdateState();
-        _rigidbody.AddForce(Vector3.down);
     }
 
     public void SetReserved()
@@ -42,17 +40,14 @@ public class ResourceItem : SpawnableObject
 
     public void SetParent(Transform newParent)
     {
-       transform.SetParent(newParent);
+        transform.SetParent(newParent);
     }
 
     public void DisablePhysics()
     {
         _rigidbody.isKinematic = true;
-    }
-
-    public void ResetPosition()
-    {
-       transform.localPosition = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
+        _rigidbody.velocity = Vector3.zero;
     }
 
     public void Disable(Transform newParent)
@@ -60,7 +55,13 @@ public class ResourceItem : SpawnableObject
         SetParent(newParent);
         Disabled?.Invoke(this);
     }
-    
+
+    public void AttachTo(Transform newParent)
+    {
+        SetParent(newParent);
+        ResetPosition();
+    }
+
     private void UpdateState()
     {
         if (_state == ResourceItemsStates.Created)
@@ -73,5 +74,12 @@ public class ResourceItem : SpawnableObject
             _renderer.material = _compitedMaterial;
             _rigidbody.isKinematic = false;
         }
+    }
+    
+    private void ResetPosition()
+    {
+        transform.localPosition = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
+        _rigidbody.velocity = Vector3.zero;
     }
 }

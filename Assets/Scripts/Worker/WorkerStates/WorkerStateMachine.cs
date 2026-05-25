@@ -9,12 +9,12 @@ namespace WorkerStates
         private readonly Dictionary<Type, IWorkerState> _states;
         private IWorkerState _currentState;
 
-        public WorkerStateMachine( TargetMover targetMover, Transform storageUnloadZone,Transform storagePutTarget, Worker worker)
+        public WorkerStateMachine( Mover mover, Transform storageUnloadZone,Transform storagePutTarget, Worker worker)
         {
             _states = new Dictionary<Type, IWorkerState>()
             {
                 { typeof(IdleState), new IdleState() },
-                { typeof(MoveState), new MoveState(this, targetMover, storageUnloadZone, worker) },
+                { typeof(MoveState), new MoveState(this, mover, storageUnloadZone, worker) },
                 { typeof(KeepState), new KeepState(this, worker) },
                 { typeof(PutState), new PutState(this, worker, storagePutTarget) },
                 
@@ -22,6 +22,8 @@ namespace WorkerStates
             
             SetState(typeof(IdleState));
         }
+
+        public string CurrentState => _currentState.GetType().Name;
 
         public void SetState(Type type, Transform target = null)
         {

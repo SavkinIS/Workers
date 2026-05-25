@@ -5,6 +5,8 @@ public class ResourceSpawner : SpawnerBase<ResourceItem>
 {
     [SerializeField] private ResourceItem _itemPrefab;
 
+    private int _count = 0;
+
     private void Awake()
     {
         CreatePool();
@@ -36,6 +38,7 @@ public class ResourceSpawner : SpawnerBase<ResourceItem>
     protected override ResourceItem InstantiateSpawnableObject()
     {
         ResourceItem item = Instantiate(_itemPrefab, transform);
+        item.name = $"{_itemPrefab.name}_{_count++}";
         item.Initialize();
         return item;
     }

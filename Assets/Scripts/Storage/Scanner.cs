@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Scanner : MonoBehaviour
@@ -20,7 +19,7 @@ public class Scanner : MonoBehaviour
     private Vector3 _startScale;
     private bool _isActive = true;
 
-    public event Action<List<ResourceItem>> Scanned;
+    public event Action<ResourceItem> Scanned;
 
     void Start()
     {
@@ -42,7 +41,6 @@ public class Scanner : MonoBehaviour
 
     private IEnumerator Scan()
     {
-        
         _scannerItem.gameObject.SetActive(true);
 
         while (Vector3.Distance(_scannerItem.localScale, _endScale) > 1f)
@@ -55,23 +53,17 @@ public class Scanner : MonoBehaviour
 
             var hits = Physics.OverlapSphere(_scannerPosition, _scannerItem.localScale.x, _layerMask);
 
-            List<ResourceItem> scannedResources = new List<ResourceItem>();
             foreach (var hit in hits)
             {
                 if (hit.TryGetComponent(out ResourceItem resourceItem))
                 {
-                    if (scannedResources.Contains(resourceItem) == false)
-                    {
-                        scannedResources.Add(resourceItem);
-                    }
+                    Scanned?.Invoke(resourceItem);
                 }
             }
-            
-            Scanned?.Invoke(scannedResources);
+
             yield return null;
         }
 
-       
         _scannerItem.gameObject.SetActive(false);
         _scannerItem.localScale = _startScale;
     }

@@ -29,7 +29,6 @@ namespace WorkerStates
                 return;
             
             _worker.PutResource();
-            _stateMachine.SetState(typeof(IdleState));
         }
 
         public void Exit()

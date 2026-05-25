@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 379fb8163eb24c70b8aec635924a5eee, type: 3}
   m_Name: Resource Config 1
   m_EditorClassIdentifier: 
-  ProduceDuration: 4
-  WaitingeDuration: 5
+  _produceDuration: 4
+  _waitingeDuration: 6

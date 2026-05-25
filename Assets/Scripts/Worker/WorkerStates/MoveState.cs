@@ -5,7 +5,7 @@ namespace WorkerStates
 {
     public class MoveState : IWorkerState
     {
-        private readonly TargetMover _targetMover;
+        private readonly Mover _mover;
         private readonly WorkerStateMachine _stateMachine;
         private readonly Worker _worker;
         private Coroutine _moveCoroutine;
@@ -13,9 +13,9 @@ namespace WorkerStates
         private bool _isActive = true;
         private readonly Transform _storageUnloadZone;
 
-        public MoveState(WorkerStateMachine stateMachine, TargetMover targetMover, Transform storageUnloadZone, Worker worker)
+        public MoveState(WorkerStateMachine stateMachine, Mover mover, Transform storageUnloadZone, Worker worker)
         {
-            _targetMover = targetMover;
+            _mover = mover;
             _storageUnloadZone = storageUnloadZone;
             _stateMachine = stateMachine;
             _worker = worker;
@@ -37,8 +37,8 @@ namespace WorkerStates
                 target = _worker.TargetResource.Transform;
             }
             
-            _targetMover.SetTarget(target);
-            _targetMover.DestinationReached += DestinationReached;
+            _mover.SetTarget(target, _worker.HasResource);
+            _mover.DestinationReached += DestinationReached;
             _moveCoroutine = _worker.StartCoroutine(MoveCoroutine());
         }
         
@@ -46,7 +46,7 @@ namespace WorkerStates
         {
             while (_isActive)
             {
-                _targetMover.Move();
+                _mover.Move();
                 yield return null;
             }
         }
@@ -54,9 +54,9 @@ namespace WorkerStates
         public void Exit()
         {
             if (_moveCoroutine  != null)
-                _targetMover.StopCoroutine(_moveCoroutine);
+                _mover.StopCoroutine(_moveCoroutine);
             
-            _targetMover.DestinationReached -= DestinationReached;
+            _mover.DestinationReached -= DestinationReached;
         }
 
         private void DestinationReached()

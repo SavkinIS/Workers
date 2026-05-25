@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
 using Configs;
 using UnityEngine;
 
-public class ResourceCreator : MonoBehaviour
+public class ResourceProducer : MonoBehaviour
 {
     [SerializeField] private ResourceSpawner _resourceSpawner;
     [SerializeField] private Transform _resourceHolder;
@@ -30,9 +29,9 @@ public class ResourceCreator : MonoBehaviour
         while (_isActive)
         {
             ResourceItem resourceItem = _resourceSpawner.Spawn();
-            resourceItem.SetParent(_resourceHolder);
-            resourceItem.ResetPosition();
 
+            resourceItem.AttachTo(_resourceHolder);
+            
             yield return _produceTime;
             resourceItem.SetCompleted();
             yield return _waitingTime;
