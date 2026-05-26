@@ -9,13 +9,13 @@ public class Mover : MonoBehaviour
     private Transform _target;
     private Rotator _rotator;
     private float _arrivalThresholdSqr;
-    private float CurrentSpeed => _config.MoveSpeed;
-
+    
     public event Action DestinationReached;
 
     private bool IsDestinationReached { get; set; }
     private bool HasTarget => _target != null;
-    private bool IsCanMove => HasTarget && !IsDestinationReached;
+    private bool CanMove => HasTarget && !IsDestinationReached;
+    private float CurrentSpeed => _config.MoveSpeed;
 
     private void Awake()
     {
@@ -26,7 +26,7 @@ public class Mover : MonoBehaviour
 
     public void Move()
     {
-        if (IsCanMove)
+        if (CanMove)
         {
             Vector3 targetPosition = _target.position;
             targetPosition.y = transform.position.y;

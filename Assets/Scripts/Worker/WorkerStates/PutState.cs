@@ -20,7 +20,7 @@ namespace WorkerStates
             if (_worker.Resource == null) 
                 return;
             
-            _replaceAnimation.Raplace(_worker.Resource.Transform, ResourcePutted);
+            _replaceAnimation.Replace(_worker.Resource.Transform, ResourcePutted);
         }
 
         private void ResourcePutted()

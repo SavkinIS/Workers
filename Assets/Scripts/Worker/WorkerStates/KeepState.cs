@@ -16,7 +16,7 @@ namespace WorkerStates
         public void Enter()
         {
             _worker.TargetResource.DisablePhysics();
-            _replaceAnimation.Raplace(_worker.TargetResource.Transform, ResourceKeeped);
+            _replaceAnimation.Replace(_worker.TargetResource.Transform, ResourceKeeped);
         }
 
         private void ResourceKeeped()

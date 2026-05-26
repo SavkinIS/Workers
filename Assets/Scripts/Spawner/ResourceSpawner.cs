@@ -26,6 +26,7 @@ public class ResourceSpawner : SpawnerBase<ResourceItem>
     protected override void Release(ResourceItem spawnableObject)
     {
         spawnableObject.gameObject.SetActive(false);
+        spawnableObject.AttachTo(transform);
         spawnableObject.Disabled -= ReleasedToPool;
     }
 

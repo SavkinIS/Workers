@@ -23,8 +23,6 @@ namespace WorkerStates
             SetState(typeof(IdleState));
         }
 
-        public string CurrentState => _currentState.GetType().Name;
-
         public void SetState(Type type, Transform target = null)
         {
             if (_states.TryGetValue(type,  out var state))

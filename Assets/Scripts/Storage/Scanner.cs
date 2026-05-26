@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Scanner : MonoBehaviour
 {
-    [SerializeField] private Transform _scannerItem;
-    [SerializeField] private TriggerDetector _detector;
+    [SerializeField] private Transform _detectionZone;
     [SerializeField] private float _delay;
     [SerializeField] private Vector3 _endScale;
     [SerializeField] private float _scanTime = 1.5f;
@@ -21,12 +21,12 @@ public class Scanner : MonoBehaviour
 
     public event Action<ResourceItem> Scanned;
 
-    void Start()
+    private void Start()
     {
         _delayTime = new WaitForSeconds(_delay);
         _durationTime = new WaitForSeconds(_scanTime);
         StartCoroutine(ScanCoroutine());
-        _startScale = _scannerItem.localScale;
+        _startScale = _detectionZone.localScale;
     }
 
     private IEnumerator ScanCoroutine()
@@ -41,17 +41,17 @@ public class Scanner : MonoBehaviour
 
     private IEnumerator Scan()
     {
-        _scannerItem.gameObject.SetActive(true);
+        _detectionZone.gameObject.SetActive(true);
 
-        while (Vector3.Distance(_scannerItem.localScale, _endScale) > 1f)
+        while (Vector3.Distance(_detectionZone.localScale, _endScale) > 1f)
         {
-            _scannerItem.localScale = Vector3.Lerp(
-                _scannerItem.localScale,
+            _detectionZone.localScale = Vector3.Lerp(
+                _detectionZone.localScale,
                 _endScale,
                 _speed * Time.deltaTime
             );
 
-            var hits = Physics.OverlapSphere(_scannerPosition, _scannerItem.localScale.x, _layerMask);
+            var hits = Physics.OverlapSphere(_scannerPosition, _detectionZone.localScale.x, _layerMask);
 
             foreach (var hit in hits)
             {
@@ -64,7 +64,7 @@ public class Scanner : MonoBehaviour
             yield return null;
         }
 
-        _scannerItem.gameObject.SetActive(false);
-        _scannerItem.localScale = _startScale;
+        _detectionZone.gameObject.SetActive(false);
+        _detectionZone.localScale = _startScale;
     }
 }

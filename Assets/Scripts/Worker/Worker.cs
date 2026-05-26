@@ -28,7 +28,6 @@ public class Worker : MonoBehaviour
     {
         TargetResource = resource;
         IsBusy = true;
-        resource.SetReserved();
         _stateMachine.SetState(typeof(MoveState));
     }
     
@@ -40,7 +39,7 @@ public class Worker : MonoBehaviour
        if (_resource == null)
            return;
        
-       _resource.SetParent(HandPlace);
+       _resource.AttachTo(HandPlace);
     }
 
     public void PutResource()

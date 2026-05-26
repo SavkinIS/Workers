@@ -9,8 +9,8 @@ public class Storage : MonoBehaviour
     [SerializeField] private Transform _putTarget;
     [SerializeField] private Scanner _scanner;
 
-    private ResourceData _resourceData = new ResourceData();
-    private WorkersData _workersData;
+    private ResourceService _resourceService = new ResourceService();
+    private WorkersService _workersService;
 
     public event Action<int> ChangedResourceAmount;
 
@@ -24,24 +24,17 @@ public class Storage : MonoBehaviour
             worker.WorkCompleted += WorkerTaskCompleted;
         }
     }
-
-    private void WorkerTaskCompleted(Worker worker)
-    {
-        _workersData.AddFreeWorker(worker);
-        
-        SendWorker();
-    }
-
+    
     private void Start()
     {
-        _workersData = new WorkersData(_workers);
+        _workersService = new WorkersService(_workers);
         
         foreach (var worker in _workers)
         {
             worker.Initialize(_inputZone, _putTarget);
         }
 
-        ChangedResourceAmount?.Invoke(_resourceData.CollectedResources);
+        ChangedResourceAmount?.Invoke(_resourceService.CollectedResources);
     }
 
     private void OnDisable()
@@ -58,37 +51,37 @@ public class Storage : MonoBehaviour
     private void Claim(ResourceItem resourceItem, Worker worker)
     {
         resourceItem.Disable(_putTarget);
-        _resourceData.CollectResource(resourceItem);
-        ChangedResourceAmount?.Invoke(_resourceData.CollectedResources);
+        _resourceService.CollectResource(resourceItem);
+        ChangedResourceAmount?.Invoke(_resourceService.CollectedResources);
     }
 
     private void AddResources(ResourceItem scannedResource)
     {
-       if ( _resourceData.TryAddResource(scannedResource))
+       if ( _resourceService.TryAddResource(scannedResource))
        {
            SendWorker();
        }
     }
 
+    private void WorkerTaskCompleted(Worker worker)
+    {
+        _workersService.AddFreeWorker(worker);
+        
+        SendWorker();
+    }
+    
     private void SendWorker()
     {
         ResourceItem resource = null;
         Worker worker = null;
         
-        if (_resourceData.HasFreeResources)
+        if (_resourceService.HasFreeResources && _workersService.HasFreeWorkers)
         {
-            if (_workersData.TryGetFreeWorker(out worker) && _resourceData.TryGetFreeResource(out resource))
+            worker = _workersService.GetFreeWorker();
+            
+            if (worker != null && _resourceService.TryGetFreeResource(out resource))
             {
                 worker.SendToResource(resource);
-                _resourceData.ReserveResource(resource);
-            }
-            else
-            {
-                if (resource != null)
-                    _resourceData.TryAddResource(resource);
-                
-                if (worker != null)
-                    _workersData.AddFreeWorker(worker);
             }
         }
     }

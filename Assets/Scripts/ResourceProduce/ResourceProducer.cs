@@ -6,7 +6,7 @@ public class ResourceProducer : MonoBehaviour
 {
     [SerializeField] private ResourceSpawner _resourceSpawner;
     [SerializeField] private Transform _resourceHolder;
-    [SerializeField] private ResourceCreatorConfig _resourceConfig;
+    [SerializeField] private ResourceProducerConfig _resourceConfig;
 
     private WaitForSeconds _produceTime;
     private WaitForSeconds _waitingTime;

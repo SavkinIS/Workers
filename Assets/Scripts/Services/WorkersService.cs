@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
-public class WorkersData
+public class WorkersService
 {
     private readonly List<Worker> _totalWorkers = new List<Worker>();
     private readonly Queue<Worker> _freeWorker = new Queue<Worker>();
 
-    public WorkersData(List<Worker> workers)
+    public WorkersService(List<Worker> workers)
     {
         _totalWorkers.AddRange(workers);
 
@@ -15,17 +15,16 @@ public class WorkersData
         }
     }
 
-    public bool TryGetFreeWorker(out Worker worker)
-    {
-        worker = null;
+    public bool HasFreeWorkers  => _freeWorker.Count > 0;
 
+    public Worker GetFreeWorker()
+    {
         if (_freeWorker.Count > 0)
         {
-            worker = _freeWorker.Dequeue();
-            return true;
+            return _freeWorker.Dequeue();
         }
-
-        return false;
+        
+        return null;
     }
 
     public void AddFreeWorker(Worker worker)

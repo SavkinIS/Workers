@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
-public class ResourceData
+public class ResourceService
 {
     private Queue<ResourceItem> _freeResources = new Queue<ResourceItem>();
     private List<ResourceItem> _reservedResources = new List<ResourceItem>();
@@ -15,23 +16,20 @@ public class ResourceData
 
         if (_freeResources.Count > 0)
         {
-            resourceItem = _freeResources.Dequeue();
-
-            if (resourceItem != null)
+            while (resourceItem == null)
             {
-                return true;
+                resourceItem = _freeResources.Dequeue();
             }
+
+            if (_reservedResources.Contains(resourceItem) == false)
+            {
+                _reservedResources.Add(resourceItem);
+            }
+                
+            return true;
         }
 
         return false;
-    }
-
-    public void ReserveResource(ResourceItem resourceItem)
-    {
-        if (_reservedResources.Contains(resourceItem) == false)
-        {
-            _reservedResources.Add(resourceItem);
-        }
     }
 
     public void CollectResource(ResourceItem resourceItem)

@@ -16,10 +16,10 @@ public class ResourceItem : SpawnableObject
     [SerializeField] private Rigidbody _rigidbody;
 
     private ResourceItemsStates _state;
+    
     public event Action<ResourceItem> Disabled;
 
     public Transform Transform => transform;
-    public bool IsReserved { get; private set; }
 
     public void Initialize()
     {
@@ -31,11 +31,6 @@ public class ResourceItem : SpawnableObject
     {
         _state = ResourceItemsStates.Completed;
         UpdateState();
-    }
-
-    public void SetReserved()
-    {
-        IsReserved = true;
     }
 
     public void SetParent(Transform newParent)

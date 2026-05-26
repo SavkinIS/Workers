@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Configs
 {
     [CreateAssetMenu(fileName = "Resource Config", menuName = "Config/ResourceConfig")]
-    public class ResourceCreatorConfig : ScriptableObject
+    public class ResourceProducerConfig : ScriptableObject
     {
         [SerializeField] private float _produceDuration = 4f;
         [SerializeField] private float _waitingeDuration = 2f;

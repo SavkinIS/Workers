@@ -18,7 +18,7 @@ namespace WorkerStates
             _jumpPower = 2f;
         }
 
-        public void Raplace(Transform target, Action onComplete = null)
+        public void Replace(Transform target, Action onComplete = null)
         {
             target.DOJump(_target.position, _jumpPower, _jumpsCount, _durationTime)
                 .SetEase(Ease.OutQuad).OnComplete(() => onComplete?.Invoke());
