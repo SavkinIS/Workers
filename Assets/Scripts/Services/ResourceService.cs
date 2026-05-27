@@ -16,11 +16,14 @@ public class ResourceService
 
         if (_freeResources.Count > 0)
         {
-            while (resourceItem == null)
+            while (resourceItem == null &&  _freeResources.Count > 0)
             {
                 resourceItem = _freeResources.Dequeue();
             }
 
+            if  (resourceItem == null)
+                return false;
+            
             if (_reservedResources.Contains(resourceItem) == false)
             {
                 _reservedResources.Add(resourceItem);

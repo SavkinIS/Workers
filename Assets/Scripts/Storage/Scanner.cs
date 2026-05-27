@@ -18,6 +18,8 @@ public class Scanner : MonoBehaviour
     private WaitForSeconds _delayTime;
     private Vector3 _startScale;
     private bool _isActive = true;
+    private float _scaleTrashHold = 1f;
+    private float _scaleTrashHoldSqr;
 
     public event Action<ResourceItem> Scanned;
 
@@ -27,6 +29,7 @@ public class Scanner : MonoBehaviour
         _durationTime = new WaitForSeconds(_scanTime);
         StartCoroutine(ScanCoroutine());
         _startScale = _detectionZone.localScale;
+        _scaleTrashHoldSqr = _scaleTrashHold * _scaleTrashHold;
     }
 
     private IEnumerator ScanCoroutine()
@@ -43,7 +46,7 @@ public class Scanner : MonoBehaviour
     {
         _detectionZone.gameObject.SetActive(true);
 
-        while (Vector3.Distance(_detectionZone.localScale, _endScale) > 1f)
+        while ((_detectionZone.localScale - _endScale).sqrMagnitude > _scaleTrashHoldSqr)
         {
             _detectionZone.localScale = Vector3.Lerp(
                 _detectionZone.localScale,
