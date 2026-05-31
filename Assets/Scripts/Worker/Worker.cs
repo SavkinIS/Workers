@@ -1,15 +1,15 @@
 ﻿using System;
+using Spawner;
 using UnityEngine;
 using WorkerStates;
 
-public class Worker : MonoBehaviour
+public class Worker : SpawnableObject
 {
     [SerializeField] private Mover _mover;
     [SerializeField] private Transform _handPlace;
 
     private WorkerStateMachine _stateMachine;
     private ResourceItem _resource;
-
     public event Action<ResourceItem, Worker> ResourcePutted;
     public event Action<Worker> WorkCompleted;
     

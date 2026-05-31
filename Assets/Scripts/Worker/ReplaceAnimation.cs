@@ -20,7 +20,8 @@ namespace WorkerStates
 
         public void Replace(Transform target, Action onComplete = null)
         {
-            target.DOJump(_target.position, _jumpPower, _jumpsCount, _durationTime)
+            target.DORotate(Vector3.zero, _durationTime);
+            target.DOMove(_target.position, _durationTime)
                 .SetEase(Ease.OutQuad).OnComplete(() => onComplete?.Invoke());
         }
     }

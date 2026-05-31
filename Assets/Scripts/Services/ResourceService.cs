@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class ResourceService
 {
@@ -7,8 +7,12 @@ public class ResourceService
     private List<ResourceItem> _reservedResources = new List<ResourceItem>();
     private int _collectedResources = 0;
 
+    public event Action<int> ChangedResourceAmount;
+    
     public int CollectedResources => _collectedResources;
     public bool HasFreeResources => _freeResources.Count > 0;
+    public int FreeResources => _freeResources.Count;
+
 
     public bool TryGetFreeResource(out ResourceItem resourceItem)
     {
@@ -41,6 +45,7 @@ public class ResourceService
         {
             _reservedResources.Remove(resourceItem);
             _collectedResources++;
+            ChangedResourceAmount?.Invoke(_collectedResources);
         }
     }
 
@@ -52,6 +57,18 @@ public class ResourceService
             return true;
         }
 
+        return false;
+    }
+
+    public bool TrySpendResource(int workerPrice)
+    {
+        if (_collectedResources >= workerPrice)
+        {
+            _collectedResources -= workerPrice;
+            ChangedResourceAmount?.Invoke(_collectedResources);
+            return true;
+        }
+        
         return false;
     }
 }

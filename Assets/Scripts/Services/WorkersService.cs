@@ -2,13 +2,10 @@ using System.Collections.Generic;
 
 public class WorkersService
 {
-    private readonly List<Worker> _totalWorkers = new List<Worker>();
     private readonly Queue<Worker> _freeWorker = new Queue<Worker>();
 
     public WorkersService(List<Worker> workers)
     {
-        _totalWorkers.AddRange(workers);
-
         foreach (var worker in workers)
         {
             _freeWorker.Enqueue(worker);
@@ -16,6 +13,7 @@ public class WorkersService
     }
 
     public bool HasFreeWorkers  => _freeWorker.Count > 0;
+    public int FreeWorkers => _freeWorker.Count;
 
     public Worker GetFreeWorker()
     {

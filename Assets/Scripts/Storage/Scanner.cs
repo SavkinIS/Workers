@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -53,19 +54,23 @@ public class Scanner : MonoBehaviour
                 _endScale,
                 _speed * Time.deltaTime
             );
-
-            var hits = Physics.OverlapSphere(_scannerPosition, _detectionZone.localScale.x, _layerMask);
-
-            foreach (var hit in hits)
-            {
-                if (hit.TryGetComponent(out ResourceItem resourceItem))
-                {
-                    Scanned?.Invoke(resourceItem);
-                }
-            }
-
+            
             yield return null;
         }
+        
+        var hits = Physics.OverlapSphere(_scannerPosition, _detectionZone.localScale.x / 2, _layerMask);
+
+        Debug.DrawRay(_scannerPosition, _detectionZone.localScale / 2, Color.red);
+            
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent(out ResourceItem resourceItem))
+            {
+                Scanned?.Invoke(resourceItem);
+            }
+        }
+
+     
 
         _detectionZone.gameObject.SetActive(false);
         _detectionZone.localScale = _startScale;

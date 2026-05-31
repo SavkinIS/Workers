@@ -1,49 +1,43 @@
 using System;
 using Configs;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Mover : MonoBehaviour
 {
     [SerializeField] private WorkerConfig _config;
+    [SerializeField] private NavMeshAgent _navMeshAgent;
 
     private Transform _target;
-    private Rotator _rotator;
-    private float _arrivalThresholdSqr;
+    //private Rotator _rotator;
+    private float _arrivalThreshold;
     
     public event Action DestinationReached;
 
     private bool IsDestinationReached { get; set; }
     private bool HasTarget => _target != null;
     private bool CanMove => HasTarget && !IsDestinationReached;
-    private float CurrentSpeed => _config.MoveSpeed;
 
     private void Awake()
     {
         IsDestinationReached = true;
 
-        _rotator = new Rotator(transform);
+        //_rotator = new Rotator(transform);
+        _navMeshAgent.speed = _config.MoveSpeed;
     }
 
     public void Move()
     {
         if (CanMove)
         {
-            Vector3 targetPosition = _target.position;
-            targetPosition.y = transform.position.y;
-
-            float step = CurrentSpeed * Time.deltaTime;
-            Vector3 newPos = Vector3.MoveTowards(transform.position, targetPosition, step);
-
-            var distance = (transform.position - _target.position).sqrMagnitude;
-
-            if (distance < _arrivalThresholdSqr)
+            if (!_navMeshAgent.pathPending &&
+                _navMeshAgent.remainingDistance <= _arrivalThreshold)
             {
                 SetTarget(null);
-                return;
             }
 
-            _rotator.Rotate();
-            transform.position = newPos;
+            //_rotator.Rotate();
+            //transform.position = newPos;
         }
     }
 
@@ -52,14 +46,26 @@ public class Mover : MonoBehaviour
         _target = target;
 
         if (toBase)
-            _arrivalThresholdSqr = _config.ArrivalBaseThresholdSqr;
+            _arrivalThreshold = _config.ArrivalBaseThreshold;
         else
-            _arrivalThresholdSqr = _config.ArrivalThresholdSqr;
+            _arrivalThreshold = _config.ArrivalThreshold;
+
+        _navMeshAgent.stoppingDistance = _arrivalThreshold;
 
         IsDestinationReached = target == null;
-        _rotator.SetTarget(target);
+        //_rotator.SetTarget(target);
 
         if (IsDestinationReached)
+        {
+            _navMeshAgent.speed = 0;
+            _navMeshAgent.isStopped = true;
             DestinationReached?.Invoke();
+        }
+        else
+        {
+            _navMeshAgent.SetDestination(target.position);
+            _navMeshAgent.isStopped = false;
+            _navMeshAgent.speed =  _config.MoveSpeed;
+        }
     }
 }
