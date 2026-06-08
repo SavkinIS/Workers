@@ -9,7 +9,6 @@ public class Mover : MonoBehaviour
     [SerializeField] private NavMeshAgent _navMeshAgent;
 
     private Transform _target;
-    //private Rotator _rotator;
     private float _arrivalThreshold;
     
     public event Action DestinationReached;
@@ -22,7 +21,6 @@ public class Mover : MonoBehaviour
     {
         IsDestinationReached = true;
 
-        //_rotator = new Rotator(transform);
         _navMeshAgent.speed = _config.MoveSpeed;
     }
 
@@ -35,9 +33,6 @@ public class Mover : MonoBehaviour
             {
                 SetTarget(null);
             }
-
-            //_rotator.Rotate();
-            //transform.position = newPos;
         }
     }
 
@@ -53,7 +48,6 @@ public class Mover : MonoBehaviour
         _navMeshAgent.stoppingDistance = _arrivalThreshold;
 
         IsDestinationReached = target == null;
-        //_rotator.SetTarget(target);
 
         if (IsDestinationReached)
         {

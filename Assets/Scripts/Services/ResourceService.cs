@@ -1,74 +1,101 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ResourceService
 {
-    private Queue<ResourceItem> _freeResources = new Queue<ResourceItem>();
-    private List<ResourceItem> _reservedResources = new List<ResourceItem>();
-    private int _collectedResources = 0;
+    private readonly Dictionary<ResourceItem, List<Storage>> _resourceOwners =
+        new Dictionary<ResourceItem, List<Storage>>();
 
-    public event Action<int> ChangedResourceAmount;
+    private readonly List<ResourceItem> _reservedResources =
+        new List<ResourceItem>();
+
+    private readonly Dictionary<Storage, int> _collectedResources = new Dictionary<Storage, int>();
+
+    public event Action<Storage, int> ChangedResourceAmount;
+
+    public void RegisterStorage(Storage storage)
+    {
+        _collectedResources[storage] = 0;
+    }
     
-    public int CollectedResources => _collectedResources;
-    public bool HasFreeResources => _freeResources.Count > 0;
-    public int FreeResources => _freeResources.Count;
+    public int CollectedResources(Storage storage) => _collectedResources[storage];
 
-
-    public bool TryGetFreeResource(out ResourceItem resourceItem)
+    public bool TryAddResource(Storage storage, ResourceItem resource)
     {
-        resourceItem = null;
+        if (resource == null || storage == null)
+            return false;
 
-        if (_freeResources.Count > 0)
+        if (_reservedResources.Contains(resource))
+            return false;
+
+        if (_resourceOwners.TryGetValue(resource, out var owners) == false)
         {
-            while (resourceItem == null &&  _freeResources.Count > 0)
-            {
-                resourceItem = _freeResources.Dequeue();
-            }
+            owners = new List<Storage>();
+            _resourceOwners.Add(resource, owners);
+        }
 
-            if  (resourceItem == null)
-                return false;
+        if (owners.Contains(storage))
+            return false;
+
+        owners.Add(storage);
+        return true;
+    }
+
+    public bool TryGetFreeResource(Storage storage, out ResourceItem resource)
+    {
+        resource = null;
+
+        foreach (var pair in _resourceOwners)
+        {
+            ResourceItem candidate = pair.Key;
+            List<Storage> owners = pair.Value;
+
+            if (candidate == null)
+                continue;
+
+            if (owners.Contains(storage) == false)
+                continue;
+
+            if (_reservedResources.Contains(candidate))
+                continue;
             
-            if (_reservedResources.Contains(resourceItem) == false)
-            {
-                _reservedResources.Add(resourceItem);
-            }
-                
+            _reservedResources.Add(candidate);
+            resource = candidate;
+            _resourceOwners.Remove(candidate);
             return true;
         }
 
         return false;
     }
 
-    public void CollectResource(ResourceItem resourceItem)
+    public void CollectResource(Storage storage, ResourceItem resource)
     {
-        if (_reservedResources.Contains(resourceItem))
-        {
-            _reservedResources.Remove(resourceItem);
-            _collectedResources++;
-            ChangedResourceAmount?.Invoke(_collectedResources);
-        }
+        if (resource == null)
+            return;
+
+        _reservedResources.Remove(resource);
+
+        _collectedResources[storage]++;
+        ChangedResourceAmount?.Invoke(storage, _collectedResources[storage]);
     }
 
-    public bool TryAddResource(ResourceItem resourceItem)
+    public bool TrySpendResource(Storage storage, int amount)
     {
-        if (_freeResources.Contains(resourceItem) == false && _reservedResources.Contains(resourceItem) == false)
-        {
-            _freeResources.Enqueue(resourceItem);
-            return true;
-        }
+        if (_collectedResources[storage] < amount)
+            return false;
 
-        return false;
+        _collectedResources[storage] -= amount;
+        ChangedResourceAmount?.Invoke(storage, _collectedResources[storage]);
+
+        return true;
     }
 
-    public bool TrySpendResource(int workerPrice)
+    public int GetAvailableResourcesCount(Storage storage)
     {
-        if (_collectedResources >= workerPrice)
-        {
-            _collectedResources -= workerPrice;
-            ChangedResourceAmount?.Invoke(_collectedResources);
-            return true;
-        }
-        
-        return false;
+        return _resourceOwners.Count(pair =>
+            pair.Key != null &&
+            pair.Value.Contains(storage) &&
+            _reservedResources.Contains(pair.Key) == false);
     }
 }

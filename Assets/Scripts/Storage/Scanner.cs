@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Scanner : MonoBehaviour
 {
+    private const float HalfReduce = 2f;
+    
     [SerializeField] private Transform _detectionZone;
     [SerializeField] private float _delay;
     [SerializeField] private Vector3 _endScale;
@@ -14,7 +14,6 @@ public class Scanner : MonoBehaviour
     [SerializeField] private LayerMask _layerMask;
 
     private WaitForSeconds _durationTime;
-    private Vector3 _scannerPosition;
     private float _scannerRadius;
     private WaitForSeconds _delayTime;
     private Vector3 _startScale;
@@ -58,10 +57,8 @@ public class Scanner : MonoBehaviour
             yield return null;
         }
         
-        var hits = Physics.OverlapSphere(_scannerPosition, _detectionZone.localScale.x / 2, _layerMask);
+        var hits = Physics.OverlapSphere(transform.position, _detectionZone.localScale.x / HalfReduce, _layerMask);
 
-        Debug.DrawRay(_scannerPosition, _detectionZone.localScale / 2, Color.red);
-            
         foreach (var hit in hits)
         {
             if (hit.TryGetComponent(out ResourceItem resourceItem))
@@ -69,9 +66,7 @@ public class Scanner : MonoBehaviour
                 Scanned?.Invoke(resourceItem);
             }
         }
-
-     
-
+        
         _detectionZone.gameObject.SetActive(false);
         _detectionZone.localScale = _startScale;
     }

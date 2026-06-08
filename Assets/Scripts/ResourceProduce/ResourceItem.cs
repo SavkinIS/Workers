@@ -33,16 +33,9 @@ public class ResourceItem : SpawnableObject
         UpdateState();
     }
 
-    public void SetParent(Transform newParent)
-    {
-        transform.SetParent(newParent);
-    }
-
     public void DisablePhysics()
     {
         _rigidbody.isKinematic = true;
-        _rigidbody.angularVelocity = Vector3.zero;
-        _rigidbody.velocity = Vector3.zero;
     }
 
     public void Disable(Transform newParent)
@@ -74,7 +67,16 @@ public class ResourceItem : SpawnableObject
     private void ResetPosition()
     {
         transform.localPosition = Vector3.zero;
-        _rigidbody.angularVelocity = Vector3.zero;
-        _rigidbody.velocity = Vector3.zero;
+        
+        if (_rigidbody.isKinematic == false)
+        {
+            _rigidbody.angularVelocity = Vector3.zero;
+            _rigidbody.velocity = Vector3.zero;
+        }
+    }
+    
+    private void SetParent(Transform newParent)
+    {
+        transform.SetParent(newParent);
     }
 }

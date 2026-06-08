@@ -16,7 +16,7 @@ public class ResourceProducer : MonoBehaviour
     private void Awake()
     {
         _produceTime = new WaitForSeconds(_resourceConfig.ProduceDuration);
-        _waitingTime = new WaitForSeconds(_resourceConfig.WaitingeDuration);
+        _waitingTime = new WaitForSeconds(_resourceConfig.WaitingDuration);
     }
 
     private void Start()

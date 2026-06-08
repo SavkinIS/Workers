@@ -7,7 +7,8 @@ public class Worker : SpawnableObject
 {
     [SerializeField] private Mover _mover;
     [SerializeField] private Transform _handPlace;
-
+    [SerializeField] private ColorChanger _colorChanger;
+    
     private WorkerStateMachine _stateMachine;
     private ResourceItem _resource;
     public event Action<ResourceItem, Worker> ResourcePutted;
@@ -15,19 +16,17 @@ public class Worker : SpawnableObject
     
     public bool HasResource => _resource != null;
     public Transform HandPlace => _handPlace;
-    public bool IsBusy { get; private set; }
     public ResourceItem TargetResource { get;  private set;}
     public ResourceItem Resource => _resource;
 
-    public void Initialize(Transform storageUnloadZone,Transform storagePutTarget)
+    public void Initialize(Transform storageUnloadZone,Transform storagePutTarget, Transform flag, Action< Worker> newStoragePositionReached)
     {
-        _stateMachine = new WorkerStateMachine(_mover, storageUnloadZone, storagePutTarget, this);
+        _stateMachine = new WorkerStateMachine(_mover, storageUnloadZone, storagePutTarget, this, flag, newStoragePositionReached);
     }
 
     public void SendToResource(ResourceItem resource)
     {
         TargetResource = resource;
-        IsBusy = true;
         _stateMachine.SetState(typeof(MoveState));
     }
     
@@ -46,8 +45,23 @@ public class Worker : SpawnableObject
     {
         ResourcePutted?.Invoke(_resource,  this);
         _resource = null;
-        IsBusy = false;
         _stateMachine.SetState(typeof(IdleState));
         WorkCompleted?.Invoke(this);
+    }
+
+    public void SendToNewStorage(Flag flag)
+    {
+        _stateMachine.SetState(typeof(MoveToBuildState));
+    }
+
+    public void DropState()
+    {
+        _stateMachine.Dispose();
+        _stateMachine =  null;
+    }
+
+    public void SetColor(Color color)
+    {
+        _colorChanger.SetColor(color);
     }
 }

@@ -6,9 +6,9 @@ namespace Configs
     public class ResourceProducerConfig : ScriptableObject
     {
         [SerializeField] private float _produceDuration = 4f;
-        [SerializeField] private float _waitingeDuration = 2f;
+        [SerializeField] private float waitingDuration = 2f;
 
         public float ProduceDuration => _produceDuration;
-        public float WaitingeDuration => _waitingeDuration;
+        public float WaitingDuration => waitingDuration;
     }
 }

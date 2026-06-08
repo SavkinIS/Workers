@@ -1,23 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Storage : MonoBehaviour
 {
+    private const int MinimalWorkersCount = 1;
+    
     [SerializeField] private List<Worker> _workers;
     [SerializeField] private Transform _inputZone;
     [SerializeField] private Transform _putTarget;
     [SerializeField] private Scanner _scanner;
     [SerializeField] private Transform _workerSpawnPoint;
+    [SerializeField] private Flag _flag;
+    [SerializeField] private ColorChanger _colorChanger;
 
-    private ResourceService _resourceService = new ResourceService();
+    private ResourceService _resourceService;
     private WorkersService _workersService;
-    
     private bool _newStorageGeneration = false;
     private WorkerSpawner _workerSpawner;
     private int _workerPrice;
-
+    private int _storagePrice;
+    private Color _storageColor;
     private Action<int> _changedResourceAmount;
+    private Action<Vector3, Worker> _newStoragePositionReached;
+    
+    public Flag Flag => _flag;
+    public bool CanBuildNext => _workers.Count > MinimalWorkersCount;
 
     private void OnEnable()
     {
@@ -35,20 +44,26 @@ public class Storage : MonoBehaviour
 
     private void Start()
     {
+        _flag.Initialize();
         _workersService = new WorkersService(_workers);
-        
+
         foreach (var worker in _workers)
         {
-            worker.Initialize(_inputZone, _putTarget);
+            worker.Initialize(_inputZone, _putTarget, _flag.transform, NewStoragePositionReached);
+            worker.SetColor(_storageColor);
         }
 
-        ResourceChangedSubscribe(CreateWorker);
-        _changedResourceAmount?.Invoke(_resourceService.CollectedResources);
+        ResourceChangedSubscribe(ResourceChanged);
+        _changedResourceAmount?.Invoke(_resourceService.CollectedResources(this));
     }
 
-    private void Update()
+    private void NewStoragePositionReached(Worker worker)
     {
-        Debug.Log($"Ресурсов {_resourceService.FreeResources} \n Рабочих {_workersService.FreeWorkers}");
+        var position = _flag.transform.position;
+        _flag.ResetPosition();
+        RemoveWorker(worker);
+        worker.DropState();
+        _newStoragePositionReached?.Invoke(position,worker);
     }
 
     private void OnDisable()
@@ -60,57 +75,107 @@ public class Storage : MonoBehaviour
         }
 
         _scanner.Scanned -= AddResources;
-        _resourceService.ChangedResourceAmount -= CallChangeResource;
+        
+        if (_resourceService != null)
+            _resourceService.ChangedResourceAmount -= CallChangeResource;
     }
-    
+
+    private void OnDestroy()
+    {
+        _newStoragePositionReached = null;
+    }
+
     public void ResourceChangedSubscribe(Action<int> updateResourceAmount)
     {
         _changedResourceAmount += updateResourceAmount;
     }
-    
-    public void SetWorkerSpawner(WorkerSpawner workerSpawner, int workerPrice)
-    {
-        _workerSpawner =  workerSpawner;
-        _workerPrice = workerPrice;
-    }
-    
-    private void CreateWorker(int obj)
-    {
-        if (_newStorageGeneration)
-            return;
 
-        if (_resourceService.TrySpendResource(_workerPrice))
+    public void Initialize(WorkerSpawner workerSpawner, int workerPrice, int storagePrice,
+        Action<Vector3, Worker> newStoragePositionReached, ResourceService resourceService, Worker worker = null)
+    {
+        _workerSpawner = workerSpawner;
+        _workerPrice = workerPrice;
+        _storagePrice = storagePrice;
+        _newStoragePositionReached += newStoragePositionReached;
+        _resourceService = resourceService;
+        
+        _resourceService.RegisterStorage(this);
+        _resourceService.ChangedResourceAmount += CallChangeResource;
+        
+        _storageColor = Random.ColorHSV();
+        _storageColor.a = 1f;
+        
+        _colorChanger.SetColor(_storageColor);
+        
+        if (worker != null)
         {
-            Worker worker = _workerSpawner.Spawn();
             _workers.Add(worker);
-            worker.Initialize(_inputZone, _putTarget);
-            worker.transform.position = _workerSpawnPoint.position;
-            worker.ResourcePutted += Claim;
-            worker.WorkCompleted += WorkerTaskCompleted;
-            _workersService.AddFreeWorker(worker);
-            
-            int freeWorkers = _workersService.FreeWorkers;
-            
-            Debug.Log($"Куплен новый Рабочий \n Рабочих {_workersService.FreeWorkers}");
-            
-            SendWorker();
+            WorkerSetting(worker);
         }
     }
     
-    private void CallChangeResource(int amount)
+    public void EnableCollectNewBase()
     {
-        _changedResourceAmount?.Invoke(amount);
+        _newStorageGeneration = true;
+
+        if (_resourceService.CollectedResources(this) >= _storagePrice)
+        {
+            SendWorkerToNewStorage();
+        }
+    }
+    
+    private void WorkerSetting(Worker worker)
+    {
+        worker.ResourcePutted += Claim;
+        worker.WorkCompleted += WorkerTaskCompleted;
+        worker.SetColor(_storageColor);
+    }
+
+    private void ResourceChanged(int resources)
+    {
+        if (_newStorageGeneration)
+        {
+            if (_resourceService.CollectedResources(this) >= _storagePrice)
+            {
+                SendWorkerToNewStorage();
+            }
+        }
+        else
+        {
+            CreateWorker();
+        }
+    }
+
+    private void CreateWorker()
+    {
+        if (_resourceService.TrySpendResource(this,_workerPrice))
+        {
+            Worker worker = _workerSpawner.Spawn();
+            _workers.Add(worker);
+            worker.Initialize(_inputZone, _putTarget, _flag.transform, NewStoragePositionReached);
+            worker.transform.position = _workerSpawnPoint.position;
+            WorkerSetting(worker);
+            _workersService.AddFreeWorker(worker);
+
+            SendWorker();
+        }
+    }
+
+    private void CallChangeResource(Storage storage, int amount)
+    {
+        if (storage.Equals(this))
+            _changedResourceAmount?.Invoke(amount);
     }
 
     private void Claim(ResourceItem resourceItem, Worker worker)
     {
         resourceItem.Disable(_putTarget);
-        _resourceService.CollectResource(resourceItem);
+        _resourceService.CollectResource(this, resourceItem);
     }
 
     private void AddResources(ResourceItem scannedResource)
     {
-       if ( _resourceService.TryAddResource(scannedResource))
+       if ( _resourceService.TryAddResource(this, scannedResource))
        {
            SendWorker();
        }
@@ -119,23 +184,49 @@ public class Storage : MonoBehaviour
     private void WorkerTaskCompleted(Worker worker)
     {
         _workersService.AddFreeWorker(worker);
-        
+
         SendWorker();
     }
-    
+
     private void SendWorker()
-    {
-        ResourceItem resource = null;
-        Worker worker = null;
-        
-        if (_resourceService.HasFreeResources && _workersService.HasFreeWorkers)
+    { 
+        if (_newStorageGeneration && _resourceService.CollectedResources(this) >= _storagePrice && _workersService.HasFreeWorkers )
         {
-            worker = _workersService.GetFreeWorker();
-            
-            if (worker != null && _resourceService.TryGetFreeResource(out resource))
-            {
-                worker.SendToResource(resource);
-            }
+            SendWorkerToNewStorage();
         }
+        else
+        {
+            Worker worker = null;
+            ResourceItem resource = null;
+
+            if (_resourceService.GetAvailableResourcesCount(this) > 0 && _workersService.HasFreeWorkers)
+            {
+                worker = _workersService.GetFreeWorker();
+
+                if (worker != null && _resourceService.TryGetFreeResource(this, out resource))
+                {
+                    worker.SendToResource(resource);
+                }
+            }
+        }  
+      
+    }
+
+    private void SendWorkerToNewStorage()
+    {
+        var worker = _workersService.GetFreeWorker();
+
+        if (worker != null &&  _resourceService.TrySpendResource(this, _storagePrice))
+        {
+            worker.SendToNewStorage(_flag);
+            _newStorageGeneration = false;
+        }
+    }
+
+    private void RemoveWorker(Worker worker)
+    {
+        _workers.Remove(worker);
+        worker.ResourcePutted -= Claim;
+        worker.WorkCompleted -= WorkerTaskCompleted;
     }
 }
