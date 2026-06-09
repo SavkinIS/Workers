@@ -1,7 +1,7 @@
 using Spawner;
 using UnityEngine;
 
-public class ResourceSpawner : SpawnerBase<ResourceItem>
+public class ResourcePoolSpawner : PoolSpawnerBase<ResourceItem>
 {
     [SerializeField] private ResourceItem _itemPrefab;
 

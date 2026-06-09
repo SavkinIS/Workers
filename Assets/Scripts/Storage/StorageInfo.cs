@@ -5,9 +5,14 @@ public class StorageInfo : MonoBehaviour
     [SerializeField] private Storage _storage;
     [SerializeField] private TMPro.TextMeshProUGUI _resourceAmount;
 
-    private void Awake()
+    private void OnEnable()
     {
-        _storage.ResourceChangedSubscribe(UpdateResourceAmount);
+        _storage.СhangedResourceAmount += UpdateResourceAmount;
+    }
+    
+    private void OnDisable()
+    {
+        _storage.СhangedResourceAmount += UpdateResourceAmount;
     }
     
     private void UpdateResourceAmount(int amount)

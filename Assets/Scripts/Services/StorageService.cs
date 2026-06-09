@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class StorageService : MonoBehaviour
 {
     [SerializeField] private Storage _storageStart;
-    [SerializeField] private WorkerSpawner _workerSpawner;
-    [SerializeField] private Storage _storagePrefab;
+    [SerializeField] private WorkerSpawner workerSpawner;
+    [SerializeField] private StorageSpawner _storageSpawner;
     [SerializeField] private int _workerPrice = 3;
     [SerializeField] private int _storagePrice = 5;
     [SerializeField] private PlayerInput _playerInput;
@@ -23,7 +24,7 @@ public class StorageService : MonoBehaviour
 
     private void Awake()
     {
-        _storageStart.Initialize(_workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService);
+        _storageStart.Initialize(workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService);
         _dragObject.Initialize();
     }
 
@@ -65,7 +66,7 @@ public class StorageService : MonoBehaviour
             if (_selectedStorage.Flag.IsActive)
             {
                 _selectedStorage.Flag.Deactivate();
-                _selectedStorage.EnableCollectNewBase();
+                _selectedStorage.EnableNewStorageConstruction();
                 _dragObject.ResetTarget();
                 _selectedStorage =  null;
             }
@@ -74,8 +75,7 @@ public class StorageService : MonoBehaviour
     
     private void BuildNewStorage(Vector3 newPosition, Worker worker)
     {
-        Storage newStorage = Instantiate(_storagePrefab, newPosition, Quaternion.identity);
-        newStorage.Initialize(_workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService, worker);
+        Storage newStorage = _storageSpawner.Spawn();
+        newStorage.Initialize(workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService, worker);
     }
-
 }

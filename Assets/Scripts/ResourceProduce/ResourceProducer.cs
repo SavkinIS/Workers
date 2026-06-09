@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ResourceProducer : MonoBehaviour
 {
-    [SerializeField] private ResourceSpawner _resourceSpawner;
+    [SerializeField] private ResourcePoolSpawner resourcePoolSpawner;
     [SerializeField] private Transform _resourceHolder;
     [SerializeField] private ResourceProducerConfig _resourceConfig;
 
@@ -28,7 +28,7 @@ public class ResourceProducer : MonoBehaviour
     {
         while (_isActive)
         {
-            ResourceItem resourceItem = _resourceSpawner.Spawn();
+            ResourceItem resourceItem = resourcePoolSpawner.Spawn();
 
             resourceItem.AttachTo(_resourceHolder);
             

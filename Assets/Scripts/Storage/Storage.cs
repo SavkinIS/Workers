@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Spawner;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Storage : MonoBehaviour
+public class Storage : SpawnableObject
 {
     private const int MinimalWorkersCount = 1;
     
@@ -17,13 +18,14 @@ public class Storage : MonoBehaviour
 
     private ResourceService _resourceService;
     private WorkersService _workersService;
-    private bool _newStorageGeneration = false;
+    private bool _isBuildingNewStorage = false;
     private WorkerSpawner _workerSpawner;
     private int _workerPrice;
     private int _storagePrice;
     private Color _storageColor;
-    private Action<int> _changedResourceAmount;
     private Action<Vector3, Worker> _newStoragePositionReached;
+    
+    public event Action<int> СhangedResourceAmount;
     
     public Flag Flag => _flag;
     public bool CanBuildNext => _workers.Count > MinimalWorkersCount;
@@ -40,6 +42,8 @@ public class Storage : MonoBehaviour
 
         if (_resourceService != null)
             _resourceService.ChangedResourceAmount += CallChangeResource;
+        
+        СhangedResourceAmount += ResourceChanged;
     }
 
     private void Start()
@@ -53,8 +57,7 @@ public class Storage : MonoBehaviour
             worker.SetColor(_storageColor);
         }
 
-        ResourceChangedSubscribe(ResourceChanged);
-        _changedResourceAmount?.Invoke(_resourceService.CollectedResources(this));
+        СhangedResourceAmount?.Invoke(_resourceService.CollectedResources(this));
     }
 
     private void NewStoragePositionReached(Worker worker)
@@ -78,16 +81,13 @@ public class Storage : MonoBehaviour
         
         if (_resourceService != null)
             _resourceService.ChangedResourceAmount -= CallChangeResource;
+        
+        СhangedResourceAmount -= ResourceChanged;
     }
 
     private void OnDestroy()
     {
         _newStoragePositionReached = null;
-    }
-
-    public void ResourceChangedSubscribe(Action<int> updateResourceAmount)
-    {
-        _changedResourceAmount += updateResourceAmount;
     }
 
     public void Initialize(WorkerSpawner workerSpawner, int workerPrice, int storagePrice,
@@ -114,9 +114,9 @@ public class Storage : MonoBehaviour
         }
     }
     
-    public void EnableCollectNewBase()
+    public void EnableNewStorageConstruction()
     {
-        _newStorageGeneration = true;
+        _isBuildingNewStorage = true;
 
         if (_resourceService.CollectedResources(this) >= _storagePrice)
         {
@@ -133,7 +133,7 @@ public class Storage : MonoBehaviour
 
     private void ResourceChanged(int resources)
     {
-        if (_newStorageGeneration)
+        if (_isBuildingNewStorage)
         {
             if (_resourceService.CollectedResources(this) >= _storagePrice)
             {
@@ -164,7 +164,7 @@ public class Storage : MonoBehaviour
     private void CallChangeResource(Storage storage, int amount)
     {
         if (storage.Equals(this))
-            _changedResourceAmount?.Invoke(amount);
+            СhangedResourceAmount?.Invoke(amount);
     }
 
     private void Claim(ResourceItem resourceItem, Worker worker)
@@ -190,7 +190,7 @@ public class Storage : MonoBehaviour
 
     private void SendWorker()
     { 
-        if (_newStorageGeneration && _resourceService.CollectedResources(this) >= _storagePrice && _workersService.HasFreeWorkers )
+        if (_isBuildingNewStorage && _resourceService.CollectedResources(this) >= _storagePrice && _workersService.HasFreeWorkers )
         {
             SendWorkerToNewStorage();
         }
@@ -219,7 +219,7 @@ public class Storage : MonoBehaviour
         if (worker != null &&  _resourceService.TrySpendResource(this, _storagePrice))
         {
             worker.SendToNewStorage(_flag);
-            _newStorageGeneration = false;
+            _isBuildingNewStorage = false;
         }
     }
 
