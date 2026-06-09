@@ -2,7 +2,12 @@ using System;
 using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
-{ 
+{
+    [SerializeField] private KeyCode _leftBtn = KeyCode.A;
+    [SerializeField] private KeyCode _rightBtn = KeyCode.D;
+    [SerializeField] private KeyCode _upBtn = KeyCode.W;
+    [SerializeField] private KeyCode _downButton = KeyCode.S;
+    
     private const int LeftMouseButton = 0;
     
     public event Action<Vector2> MouseClicked;
@@ -18,16 +23,16 @@ public class PlayerInput : MonoBehaviour
 
         Vertical = 0;
         
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(_rightBtn))
             Vertical++;
-        else if (Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(_leftBtn))
             Vertical--;
         
         Horizontal = 0;
         
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(_upBtn))
             Horizontal++;
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(_downButton))
             Horizontal--;
     }
 }

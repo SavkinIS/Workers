@@ -9,8 +9,6 @@ public class DragObject : MonoBehaviour
     private Transform _target;
     private Coroutine _dragCoroutine;
     private float _maxRayDistance = 1000f;
-    private Vector3 _oldPosition;
-    private Vector3 _newPosition;
 
     private void OnEnable()
     {
@@ -37,7 +35,6 @@ public class DragObject : MonoBehaviour
 
         if (_target != null)
         {
-            _oldPosition = _target.position;
             _dragCoroutine = StartCoroutine(DragCoroutine());
         }
     }
@@ -58,15 +55,8 @@ public class DragObject : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit, _maxRayDistance, _targetLayer))
             {
-                _newPosition = hit.point;
+                _target.position = hit.point;
             }
-            else
-            {
-                _newPosition = _oldPosition;
-            }
-
-            _target.position = _newPosition;
-            _oldPosition = _newPosition;
 
             yield return null;
         }
