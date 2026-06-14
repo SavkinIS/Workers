@@ -22,9 +22,7 @@ namespace WorkerStates
         public void Enter()
         {
             _worker.TargetResource.DisablePhysics();
-
             _worker.StartCoroutine(KeepCoroutine());
-           
         }
 
         private IEnumerator KeepCoroutine()
@@ -36,7 +34,6 @@ namespace WorkerStates
         private void ResourceKeeped()
         {
             _worker.KeepResource();
-            _stateMachine.SetState(typeof(MoveState));
         }
 
         public void Exit()

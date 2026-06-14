@@ -11,6 +11,11 @@ public class Worker : SpawnableObject
     
     private WorkerStateMachine _stateMachine;
     private ResourceItem _resource;
+    private IWorkerTask _task;
+    private Transform _storageFlag;
+    private Transform _storageUnloadZone;
+    private Action<Worker> _newStoragePositionReached;
+
     public event Action<ResourceItem> ResourcePutted;
     public event Action<Worker> WorkCompleted;
     
@@ -18,18 +23,23 @@ public class Worker : SpawnableObject
     public Transform HandPlace => _handPlace;
     public ResourceItem TargetResource { get;  private set;}
     public ResourceItem Resource => _resource;
+    public IWorkerTask Task => _task;
 
     public void Initialize(Transform storageUnloadZone,Transform storagePutTarget, Transform flag, Action< Worker> newStoragePositionReached)
     {
-        _stateMachine = new WorkerStateMachine(_mover, storageUnloadZone, storagePutTarget, this, flag, newStoragePositionReached);
+        _storageFlag = flag;
+        _storageUnloadZone = storageUnloadZone;
+        _newStoragePositionReached = newStoragePositionReached;
+        _stateMachine = new WorkerStateMachine(_mover, storagePutTarget, this);
     }
 
     public void SendToResource(ResourceItem resource)
     {
-        TargetResource = resource;
+        TargetResource  = resource;
+        _task = new MoveTask(resource.transform, ExecuteKeepState);
         _stateMachine.SetState(typeof(MoveState));
     }
-    
+
     public void KeepResource()
     {
        _resource = TargetResource;
@@ -39,6 +49,7 @@ public class Worker : SpawnableObject
            return;
        
        _resource.AttachTo(HandPlace);
+       SendToStorage();
     }
 
     public void PutResource()
@@ -51,7 +62,8 @@ public class Worker : SpawnableObject
 
     public void SendToNewStorage()
     {
-        _stateMachine.SetState(typeof(MoveToBuildState));
+        _task = new MoveTask(_storageFlag, NewStorageReached);
+        _stateMachine.SetState(typeof(MoveState));
     }
 
     public void DropState()
@@ -63,5 +75,26 @@ public class Worker : SpawnableObject
     public void SetColor(Color color)
     {
         _colorChanger.SetColor(color);
+    }
+    
+    private void ExecuteKeepState()
+    {
+        _stateMachine.SetState((typeof(KeepState)));
+    }
+
+    private void SendToStorage()
+    {
+        _task = new MoveTask(_storageUnloadZone, ExecutePutState);
+        _stateMachine.SetState(typeof(MoveState));
+    }
+
+    private void ExecutePutState()
+    {
+        _stateMachine.SetState((typeof(PutState)));
+    }
+
+    private void NewStorageReached()
+    {
+        _newStoragePositionReached?.Invoke(this);
     }
 }
