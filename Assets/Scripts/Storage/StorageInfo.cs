@@ -12,7 +12,7 @@ public class StorageInfo : MonoBehaviour
     
     private void OnDisable()
     {
-        _storage.СhangedResourceAmount += UpdateResourceAmount;
+        _storage.СhangedResourceAmount -= UpdateResourceAmount;
     }
     
     private void UpdateResourceAmount(int amount)

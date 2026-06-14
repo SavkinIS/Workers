@@ -212,7 +212,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2872,7 +2872,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -9353,9 +9353,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd94656c9e64e04a74325032bc721ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leftBtn: 97
-  _rightBtn: 100
-  _upBtn: 119
+  _leftButton: 97
+  _rightButton: 100
+  _upButton: 119
   _downButton: 115
 --- !u!4 &495742362
 Transform:
@@ -9505,6 +9505,7 @@ GameObject:
   - component: {fileID: 508035250}
   - component: {fileID: 508035252}
   - component: {fileID: 508035251}
+  - component: {fileID: 508035253}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -9574,6 +9575,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 508035249}
   m_CullTransparentMesh: 1
+--- !u!114 &508035253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508035249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c747e91be2a44419792420fb3042bca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _input: {fileID: 495742361}
+  _leftButton: {fileID: 4786803}
+  _rightButton: {fileID: 810226400}
+  _upButton: {fileID: 2049398571}
+  _downButton: {fileID: 179346946}
 --- !u!1 &516086471
 GameObject:
   m_ObjectHideFlags: 0
@@ -15784,7 +15802,7 @@ GameObject:
   - component: {fileID: 803402748}
   - component: {fileID: 803402747}
   m_Layer: 5
-  m_Name: Buttons
+  m_Name: RightButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16045,7 +16063,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -16898,7 +16916,7 @@ GameObject:
   - component: {fileID: 846584215}
   - component: {fileID: 846584214}
   m_Layer: 5
-  m_Name: Buttons
+  m_Name: DownButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17578,7 +17596,7 @@ GameObject:
   - component: {fileID: 889613151}
   - component: {fileID: 889613150}
   m_Layer: 5
-  m_Name: Buttons
+  m_Name: UpButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32260,7 +32278,7 @@ GameObject:
   - component: {fileID: 1644539263}
   - component: {fileID: 1644539262}
   m_Layer: 5
-  m_Name: Buttons
+  m_Name: LeftButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40476,7 +40494,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

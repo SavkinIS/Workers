@@ -35,7 +35,6 @@ public class Storage : SpawnableObject
         _workersManager.WorkCompleted += WorkerTaskCompleted;
         _wallet.СhangedResourceAmount += CallChangeResource;
 
-        СhangedResourceAmount += ResourceChanged;
     }
 
     private void Start()
@@ -52,7 +51,6 @@ public class Storage : SpawnableObject
         _scanner.Scanned -= AddResources;
         _wallet.СhangedResourceAmount -= CallChangeResource;
 
-        СhangedResourceAmount -= ResourceChanged;
     }
 
     private void OnDestroy()
@@ -85,7 +83,7 @@ public class Storage : SpawnableObject
         }
     }
 
-    private void ResourceChanged(int resources)
+    private void ResourceClaimed()
     {
         if (_isBuildingNewStorage)
         {
@@ -119,6 +117,7 @@ public class Storage : SpawnableObject
     {
         resourceItem.Disable(_putTarget);
         _wallet.CollectResource();
+        ResourceClaimed();
     }
 
     private void AddResources(ResourceItem scannedResource)
