@@ -11,7 +11,7 @@ public class Worker : SpawnableObject
     
     private WorkerStateMachine _stateMachine;
     private ResourceItem _resource;
-    public event Action<ResourceItem, Worker> ResourcePutted;
+    public event Action<ResourceItem> ResourcePutted;
     public event Action<Worker> WorkCompleted;
     
     public bool HasResource => _resource != null;
@@ -43,13 +43,13 @@ public class Worker : SpawnableObject
 
     public void PutResource()
     {
-        ResourcePutted?.Invoke(_resource,  this);
+        ResourcePutted?.Invoke(_resource);
         _resource = null;
         _stateMachine.SetState(typeof(IdleState));
         WorkCompleted?.Invoke(this);
     }
 
-    public void SendToNewStorage(Flag flag)
+    public void SendToNewStorage()
     {
         _stateMachine.SetState(typeof(MoveToBuildState));
     }

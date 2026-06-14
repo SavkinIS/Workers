@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,17 +8,6 @@ public class ResourceService
 
     private readonly List<ResourceItem> _reservedResources =
         new List<ResourceItem>();
-
-    private readonly Dictionary<Storage, int> _collectedResources = new Dictionary<Storage, int>();
-
-    public event Action<Storage, int> ChangedResourceAmount;
-
-    public void RegisterStorage(Storage storage)
-    {
-        _collectedResources[storage] = 0;
-    }
-    
-    public int CollectedResources(Storage storage) => _collectedResources[storage];
 
     public bool TryAddResource(Storage storage, ResourceItem resource)
     {
@@ -67,28 +55,6 @@ public class ResourceService
         }
 
         return false;
-    }
-
-    public void CollectResource(Storage storage, ResourceItem resource)
-    {
-        if (resource == null)
-            return;
-
-        _reservedResources.Remove(resource);
-
-        _collectedResources[storage]++;
-        ChangedResourceAmount?.Invoke(storage, _collectedResources[storage]);
-    }
-
-    public bool TrySpendResource(Storage storage, int amount)
-    {
-        if (_collectedResources[storage] < amount)
-            return false;
-
-        _collectedResources[storage] -= amount;
-        ChangedResourceAmount?.Invoke(storage, _collectedResources[storage]);
-
-        return true;
     }
 
     public int GetAvailableResourcesCount(Storage storage)

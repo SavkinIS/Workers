@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class StorageService : MonoBehaviour
 {
@@ -24,7 +22,7 @@ public class StorageService : MonoBehaviour
 
     private void Awake()
     {
-        _storageStart.Initialize(workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService);
+        _storageStart.Initialize(_workerPrice, _storagePrice, BuildNewStorage, _resourceService);
         _dragObject.Initialize();
     }
 
@@ -75,7 +73,7 @@ public class StorageService : MonoBehaviour
     
     private void BuildNewStorage(Vector3 newPosition, Worker worker)
     {
-        Storage newStorage = _storageSpawner.Spawn();
-        newStorage.Initialize(workerSpawner, _workerPrice, _storagePrice, BuildNewStorage, _resourceService, worker);
+        Storage newStorage = _storageSpawner.Spawn(newPosition);
+        newStorage.Initialize(_workerPrice, _storagePrice, BuildNewStorage, _resourceService, worker);
     }
 }

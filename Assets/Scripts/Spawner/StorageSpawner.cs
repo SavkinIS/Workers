@@ -5,9 +5,11 @@ public class StorageSpawner : SpawnerBase<Storage>
     [SerializeField] private Storage _itemPrefab;
     [SerializeField] private Transform _holder;
 
-    public Storage Spawn()
+    public Storage Spawn(Vector3 newPosition)
     {
-        return InstantiateSpawnableObject();
+        Storage storage = InstantiateSpawnableObject();
+        storage.transform.position = newPosition;
+        return storage;
     }
     
     protected override Storage InstantiateSpawnableObject()
